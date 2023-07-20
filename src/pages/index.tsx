@@ -1,9 +1,29 @@
 import { Box, Button, TextInput } from "@mantine/core";
 import { signIn, signOut, useSession } from "next-auth/react";
 import Head from "next/head";
+import { useState } from "react";
 import Grid from "~/components/ImagesGrid";
+import { api } from "~/utils/api";
 
 export default function Home() {
+  const [prompt, setPrompt] = useState("");
+  const [negativePrompt, setNegativePrompt] = useState("");
+
+  const utils = api.useContext();
+
+  const postImage = api.example.postImage.useMutation({
+    onSuccess: () => {
+      utils.example.getImages.invalidate();
+    },
+  });
+
+  const handleSubmit = (e: any) => {
+    e.preventDefault();
+    postImage.mutate({ prompt, negativePrompt });
+    setPrompt("");
+    setNegativePrompt("");
+  };
+
   return (
     <>
       <Head>
@@ -13,6 +33,8 @@ export default function Home() {
       </Head>
       <Box component="main">
         <Box
+          component="form"
+          onSubmit={handleSubmit}
           sx={{
             display: "flex",
             justifyContent: "center",
@@ -23,10 +45,21 @@ export default function Home() {
           }}
         >
           <Box sx={{ width: "60%", alignItems: "center" }}>
-            <TextInput label="Prompt" required />
-            <TextInput label="Negative Prompt" />
+            <TextInput
+              label="Prompt"
+              required
+              value={prompt}
+              onChange={(e) => setPrompt(e.target.value)}
+            />
+            <TextInput
+              label="Negative Prompt"
+              value={negativePrompt}
+              onChange={(e) => setNegativePrompt(e.target.value)}
+            />
           </Box>
-          <Button>Submit</Button>
+          <Button type="submit" disabled>
+            Submit
+          </Button>
         </Box>
         <Grid />
       </Box>
