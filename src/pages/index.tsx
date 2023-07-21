@@ -1,4 +1,4 @@
-import { Box, Button, TextInput } from "@mantine/core";
+import { Box, Button, Loader, TextInput } from "@mantine/core";
 import { signIn, signOut, useSession } from "next-auth/react";
 import Head from "next/head";
 import { useState } from "react";
@@ -32,6 +32,7 @@ export default function Home() {
         <link rel="icon" href="/favicon.ico" />
       </Head>
       <Box component="main">
+        <AuthShowcase />
         <Box
           component="form"
           onSubmit={handleSubmit}
@@ -57,8 +58,16 @@ export default function Home() {
               onChange={(e) => setNegativePrompt(e.target.value)}
             />
           </Box>
-          <Button type="submit" disabled>
-            Submit
+          <Button type="submit" disabled={postImage.isLoading}>
+            {postImage.isLoading ? (
+              <Box
+                sx={{ display: "flex", alignItems: "center", gap: "0.25rem" }}
+              >
+                <Loader size={"sm"} /> Carregando
+              </Box>
+            ) : (
+              "Submit"
+            )}
           </Button>
         </Box>
         <Grid />
