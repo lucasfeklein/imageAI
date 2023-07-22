@@ -14,6 +14,7 @@ import { MantineLogo } from "@mantine/ds";
 import { useDisclosure } from "@mantine/hooks";
 import { IconChevronDown } from "@tabler/icons-react";
 import { signIn, signOut, useSession } from "next-auth/react";
+import Link from "next/link";
 
 const HEADER_HEIGHT = rem(60);
 
@@ -90,12 +91,12 @@ export function HeaderAction({ links }: HeaderActionProps) {
           withinPortal
         >
           <Menu.Target>
-            <a href={link.link} className={classes.link}>
+            <Link href={link.link} className={classes.link}>
               <Center>
                 <span className={classes.linkLabel}>{link.label}</span>
                 <IconChevronDown size={rem(12)} stroke={1.5} />
               </Center>
-            </a>
+            </Link>
           </Menu.Target>
           <Menu.Dropdown>{menuItems}</Menu.Dropdown>
         </Menu>
@@ -103,9 +104,9 @@ export function HeaderAction({ links }: HeaderActionProps) {
     }
 
     return (
-      <a key={link.label} href={link.link} className={classes.link}>
+      <Link key={link.label} href={link.link} className={classes.link}>
         {link.label}
-      </a>
+      </Link>
     );
   });
 
