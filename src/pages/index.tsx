@@ -2,8 +2,8 @@ import { Box, Button, Loader, TextInput } from "@mantine/core";
 import { signIn, signOut, useSession } from "next-auth/react";
 import Head from "next/head";
 import { useState } from "react";
-import { HeaderAction } from "~/components/HeaderAction";
 import Grid from "~/components/ImagesGrid";
+import Layout from "~/components/Layout";
 import { api } from "~/utils/api";
 
 export default function Home() {
@@ -33,45 +33,46 @@ export default function Home() {
         <link rel="icon" href="/favicon.ico" />
       </Head>
       <Box component="main">
-        <HeaderAction links={[{ label: "Home", link: "/" }]} />
-        <Box
-          component="form"
-          onSubmit={handleSubmit}
-          sx={{
-            display: "flex",
-            justifyContent: "center",
-            alignItems: "center",
-            flexDirection: "column",
-            gap: "0.5rem",
-            marginBottom: "1rem",
-          }}
-        >
-          <Box sx={{ width: "60%", alignItems: "center" }}>
-            <TextInput
-              label="Prompt"
-              required
-              value={prompt}
-              onChange={(e) => setPrompt(e.target.value)}
-            />
-            <TextInput
-              label="Negative Prompt"
-              value={negativePrompt}
-              onChange={(e) => setNegativePrompt(e.target.value)}
-            />
+        <Layout>
+          <Box
+            component="form"
+            onSubmit={handleSubmit}
+            sx={{
+              display: "flex",
+              justifyContent: "center",
+              alignItems: "center",
+              flexDirection: "column",
+              gap: "0.5rem",
+              marginBottom: "1rem",
+            }}
+          >
+            <Box sx={{ width: "60%", alignItems: "center" }}>
+              <TextInput
+                label="Prompt"
+                required
+                value={prompt}
+                onChange={(e) => setPrompt(e.target.value)}
+              />
+              <TextInput
+                label="Negative Prompt"
+                value={negativePrompt}
+                onChange={(e) => setNegativePrompt(e.target.value)}
+              />
+            </Box>
+            <Button type="submit" disabled={postImage.isLoading}>
+              {postImage.isLoading ? (
+                <Box
+                  sx={{ display: "flex", alignItems: "center", gap: "0.25rem" }}
+                >
+                  <Loader size={"sm"} /> Carregando
+                </Box>
+              ) : (
+                "Submit"
+              )}
+            </Button>
           </Box>
-          <Button type="submit" disabled={postImage.isLoading}>
-            {postImage.isLoading ? (
-              <Box
-                sx={{ display: "flex", alignItems: "center", gap: "0.25rem" }}
-              >
-                <Loader size={"sm"} /> Carregando
-              </Box>
-            ) : (
-              "Submit"
-            )}
-          </Button>
-        </Box>
-        <Grid />
+          <Grid />
+        </Layout>
       </Box>
     </>
   );
