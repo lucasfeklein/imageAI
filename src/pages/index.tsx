@@ -2,6 +2,7 @@ import { Box, Button, Loader, TextInput } from "@mantine/core";
 import { signIn, signOut, useSession } from "next-auth/react";
 import Head from "next/head";
 import { useState } from "react";
+import { HeaderAction } from "~/components/HeaderAction";
 import Grid from "~/components/ImagesGrid";
 import { api } from "~/utils/api";
 
@@ -32,7 +33,7 @@ export default function Home() {
         <link rel="icon" href="/favicon.ico" />
       </Head>
       <Box component="main">
-        <AuthShowcase />
+        <HeaderAction links={[{ label: "Home", link: "/" }]} />
         <Box
           component="form"
           onSubmit={handleSubmit}
