@@ -13,7 +13,7 @@ import {
 import { MantineLogo } from "@mantine/ds";
 import { useDisclosure } from "@mantine/hooks";
 import { IconChevronDown } from "@tabler/icons-react";
-import { signIn, signOut, useSession } from "next-auth/react";
+import { useSession } from "next-auth/react";
 import Link from "next/link";
 
 const HEADER_HEIGHT = rem(60);
@@ -131,13 +131,11 @@ export function HeaderAction({ links }: HeaderActionProps) {
               {sessionData?.user.email}
             </span>
           )}
-          <Button
-            radius="xl"
-            h={30}
-            onClick={sessionData ? () => signOut() : () => signIn()}
-          >
-            {sessionData ? "Sair" : "Entrar"}
-          </Button>
+          <Link href="/login">
+            <Button radius="xl" h={30}>
+              {sessionData ? "Sair" : "Entrar"}
+            </Button>
+          </Link>
         </Box>
       </Container>
     </Header>
