@@ -1,12 +1,31 @@
 import { Box, Button, Select, Skeleton, Textarea } from "@mantine/core";
+import Image from "next/image";
 import { useState } from "react";
 import Layout from "~/components/Layout";
+import { api } from "~/utils/api";
+
+interface ImageInfo {
+  width: number;
+  height: number;
+}
 
 const Generator = () => {
   const [prompt, setPrompt] = useState("");
   const [negativePrompt, setNegativePrompt] = useState("");
   const [width, setWidth] = useState("");
   const [height, setHeight] = useState("");
+
+  const [lastImageInfo, setLastImageInfo] = useState<ImageInfo | null>(null);
+
+  const utils = api.useContext();
+
+  const postImage = api.example.postImage.useMutation({
+    onSuccess() {
+      utils.example.getImages.invalidate();
+    },
+  });
+
+  const imageData = postImage.data; // Returns the data from the created image in Prisma
 
   const values = [
     { value: "128", label: "128" },
@@ -24,7 +43,18 @@ const Generator = () => {
     { value: "1024", label: "1024" },
   ];
 
-  const handleSubmit = () => {};
+  const handleSubmit = (e: any) => {
+    e.preventDefault();
+    postImage.mutate({
+      prompt,
+      negativePrompt,
+    });
+
+    setLastImageInfo({
+      width: parseInt(width, 10),
+      height: parseInt(height, 10),
+    });
+  };
 
   return (
     <Layout>
@@ -85,7 +115,9 @@ const Generator = () => {
               defaultValue="512"
             />
           </Box>
-          <Button type="submit">Gerar</Button>
+          <Button type="submit" loading={postImage.isLoading}>
+            {postImage.isLoading ? "Gerando" : "Gerar"}
+          </Button>
         </Box>
         <Box
           sx={{
@@ -96,11 +128,22 @@ const Generator = () => {
             alignItems: "center",
           }}
         >
-          <Skeleton
-            height={`${height}px`}
-            width={`${width}px`}
-            animate={false}
-          />
+          {postImage.isLoading || !imageData ? (
+            <Skeleton
+              height={
+                lastImageInfo ? `${lastImageInfo.height}px` : `${height}px`
+              }
+              width={lastImageInfo ? `${lastImageInfo.width}px` : `${width}px`}
+              animate={postImage.isLoading}
+            />
+          ) : (
+            <Image
+              src={imageData.imageUrl}
+              width={parseInt(width, 10)}
+              height={parseInt(height, 10)}
+              alt="Image generated"
+            />
+          )}
         </Box>
       </Box>
     </Layout>
