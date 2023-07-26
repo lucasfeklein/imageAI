@@ -3,6 +3,7 @@ import { Notifications } from "@mantine/notifications";
 import { type Session } from "next-auth";
 import { SessionProvider } from "next-auth/react";
 import { type AppType } from "next/app";
+import BlurImagesProvider from "~/components/BlurImagesProvider";
 import "~/styles/globals.css";
 import { api } from "~/utils/api";
 
@@ -20,10 +21,12 @@ const MyApp: AppType<{ session: Session | null }> = ({
         primaryColor: "orange",
       }}
     >
-      <Notifications />
-      <SessionProvider session={session}>
-        <Component {...pageProps} />
-      </SessionProvider>
+      <BlurImagesProvider>
+        <Notifications />
+        <SessionProvider session={session}>
+          <Component {...pageProps} />
+        </SessionProvider>
+      </BlurImagesProvider>
     </MantineProvider>
   );
 };

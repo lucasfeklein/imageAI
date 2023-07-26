@@ -1,4 +1,5 @@
 import {
+  ActionIcon,
   Box,
   Burger,
   Button,
@@ -12,9 +13,11 @@ import {
 } from "@mantine/core";
 import { MantineLogo } from "@mantine/ds";
 import { useDisclosure } from "@mantine/hooks";
-import { IconChevronDown } from "@tabler/icons-react";
+import { IconChevronDown, IconEye, IconEyeOff } from "@tabler/icons-react";
 import { useSession } from "next-auth/react";
 import Link from "next/link";
+import { useContext } from "react";
+import { BlurImagesContext } from "./BlurImagesProvider";
 
 const HEADER_HEIGHT = rem(60);
 
@@ -73,6 +76,8 @@ interface HeaderActionProps {
 }
 
 export function HeaderAction({ links }: HeaderActionProps) {
+  const { isBlur, setIsBlur } = useContext(BlurImagesContext);
+
   const { data: sessionData, status } = useSession();
 
   const { classes } = useStyles();
@@ -125,12 +130,26 @@ export function HeaderAction({ links }: HeaderActionProps) {
         <Group spacing={5} className={classes.links}>
           {items}
         </Group>
-        <Box>
+        <Box
+          sx={{
+            display: "flex",
+            justifyContent: "center",
+            alignItems: "center",
+            gap: "0.5rem",
+          }}
+        >
           {sessionData && (
             <span style={{ marginRight: "0.5rem" }}>
               {sessionData?.user.email}
             </span>
           )}
+          <ActionIcon>
+            {isBlur ? (
+              <IconEyeOff onClick={() => setIsBlur(!isBlur)} />
+            ) : (
+              <IconEye onClick={() => setIsBlur(!isBlur)} />
+            )}
+          </ActionIcon>
           <Link href="/login">
             <Button radius="xl" h={30}>
               {sessionData ? "Sair" : "Entrar"}
