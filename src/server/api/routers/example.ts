@@ -14,7 +14,7 @@ export const exampleRouter = createTRPCRouter({
   }),
 
   postImage: publicProcedure
-    .input(z.object({ prompt: z.string(), negativePrompt: z.string() }))
+    .input(z.object({ prompt: z.string() }))
     .mutation(async ({ ctx, input }) => {
       const replicate = new Replicate({
         auth: env.REPLICATE_API_TOKEN,
@@ -27,7 +27,7 @@ export const exampleRouter = createTRPCRouter({
         {
           input: {
             prompt: input.prompt,
-            negative_prompt: input.negativePrompt,
+            negative_prompt: "",
             width: 512,
             height: 512,
           },

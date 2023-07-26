@@ -1,4 +1,4 @@
-import { Box, Button, Select, Skeleton, Textarea } from "@mantine/core";
+import { Box, Button, Chip, Select, Skeleton } from "@mantine/core";
 import Image from "next/image";
 import { useState } from "react";
 import Layout from "~/components/Layout";
@@ -10,10 +10,16 @@ interface ImageInfo {
 }
 
 const Generator = () => {
-  const [prompt, setPrompt] = useState("");
-  const [negativePrompt, setNegativePrompt] = useState("");
   const [width, setWidth] = useState("");
   const [height, setHeight] = useState("");
+
+  const [promptObject, setPromptObject] = useState<{ [key: string]: string[] }>(
+    {
+      base: [],
+      numberOfPeople: [],
+      body: [],
+    }
+  );
 
   const [lastImageInfo, setLastImageInfo] = useState<ImageInfo | null>(null);
 
@@ -45,15 +51,42 @@ const Generator = () => {
 
   const handleSubmit = (e: any) => {
     e.preventDefault();
+
+    // Extract all values from the promptObject
+    const allValues = Object.values(promptObject);
+
+    // Flatten the array of arrays into a single array using concat and spread operator
+    const flattenedArray = ([] as string[]).concat(...allValues);
+
+    // Create the comma-separated string
+    const prompt = flattenedArray.join(",");
+
+    console.log(prompt);
+
     postImage.mutate({
       prompt,
-      negativePrompt,
     });
 
     setLastImageInfo({
       width: parseInt(width, 10),
       height: parseInt(height, 10),
     });
+  };
+
+  const handleChipClick = (key: string, value: string) => {
+    if (promptObject[key]?.includes(value)) {
+      setPromptObject((prevPromptObject) => ({
+        ...prevPromptObject,
+        [key]: prevPromptObject[key]?.filter(
+          (chip) => chip !== value
+        ) as string[],
+      }));
+    } else {
+      setPromptObject((prevPromptObject) => ({
+        ...prevPromptObject,
+        [key]: [...(prevPromptObject[key] ?? []), value],
+      }));
+    }
   };
 
   return (
@@ -63,7 +96,6 @@ const Generator = () => {
           display: "flex",
           justifyContent: "center",
           alignItems: "center",
-          height: "calc(100vh - 3.75rem)",
         }}
       >
         <Box
@@ -80,23 +112,81 @@ const Generator = () => {
             gap: "30px",
           }}
         >
-          <Textarea
-            label="Prompt"
-            required
-            placeholder="a photo of a thin irish red headed woman with freckles in shibari bondage, tied up, (detailed face), ((ballgag))"
-            minRows={3}
-            sx={{ width: "100%" }}
-            value={prompt}
-            onChange={(e) => setPrompt(e.target.value)}
-          />
-          <Textarea
-            label="Negative Prompt"
-            placeholder="((blurry)), duplicate, deformed, makeup, cartoon, animated, render, missing limbs, child, childish"
-            minRows={3}
-            sx={{ margin: "1rem 0", width: "100%" }}
-            value={negativePrompt}
-            onChange={(e) => setNegativePrompt(e.target.value)}
-          />
+          <Box sx={{ width: "100%" }}>
+            <Box
+              sx={{
+                fontSize: "24px",
+                fontWeight: "bold",
+                borderBottom: "2px solid #e8590c",
+                paddingBottom: "8px",
+                textTransform: "uppercase",
+                fontFamily: "Arial, sans-serif",
+                letterSpacing: "2px",
+                marginBottom: "1rem",
+              }}
+            >
+              Base
+            </Box>
+            <Box sx={{ display: "flex", gap: "1rem", flexWrap: "wrap" }}>
+              {chipsObject.base.map((value, i) => (
+                <Chip key={i} onClick={() => handleChipClick("base", value)}>
+                  {value}
+                </Chip>
+              ))}
+            </Box>
+          </Box>
+
+          <Box sx={{ width: "100%" }}>
+            <Box
+              sx={{
+                fontSize: "24px",
+                fontWeight: "bold",
+                borderBottom: "2px solid #e8590c",
+                paddingBottom: "8px",
+                textTransform: "uppercase",
+                fontFamily: "Arial, sans-serif",
+                letterSpacing: "2px",
+                marginBottom: "1rem",
+              }}
+            >
+              Number of people
+            </Box>
+            <Box sx={{ display: "flex", gap: "1rem", flexWrap: "wrap" }}>
+              {chipsObject.numberOfPeople.map((value, i) => (
+                <Chip
+                  key={i}
+                  onClick={() => handleChipClick("numberOfPeople", value)}
+                >
+                  {value}
+                </Chip>
+              ))}
+            </Box>
+          </Box>
+
+          <Box sx={{ width: "100%" }}>
+            <Box
+              sx={{
+                fontSize: "24px",
+                fontWeight: "bold",
+                borderBottom: "2px solid #e8590c",
+                paddingBottom: "8px",
+                textTransform: "uppercase",
+                fontFamily: "Arial, sans-serif",
+                letterSpacing: "2px",
+                marginBottom: "1rem",
+              }}
+            >
+              Body
+            </Box>
+            <Box sx={{ display: "flex", gap: "1rem", flexWrap: "wrap" }}>
+              {chipsObject.body.map((value, i) => (
+                <Chip key={i} onClick={() => handleChipClick("body", value)}>
+                  {value}
+                </Chip>
+              ))}
+            </Box>
+          </Box>
+
           <Box sx={{ display: "flex", gap: "1rem" }}>
             <Select
               data={values}
@@ -151,3 +241,9 @@ const Generator = () => {
 };
 
 export default Generator;
+
+const chipsObject = {
+  base: ["Man", "Woman", "Man + Woman", "Man + Man", "Woman + Woman"],
+  numberOfPeople: ["One", "Two", "Several"],
+  body: ["Busty", "Beautiful", "Tattoo", "Big ass", "Muscular", "Chubby"],
+};
