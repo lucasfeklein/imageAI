@@ -1,6 +1,7 @@
-import { Box, Button, Chip, Select, Skeleton } from "@mantine/core";
+import { Box, Button, Chip, Overlay, Select, Skeleton } from "@mantine/core";
 import Image from "next/image";
-import { useState } from "react";
+import { useContext, useState } from "react";
+import { BlurImagesContext } from "~/components/BlurImagesProvider";
 import Layout from "~/components/Layout";
 import { api } from "~/utils/api";
 
@@ -9,21 +10,22 @@ interface ImageInfo {
   height: number;
 }
 
+type Object = {
+  category: string;
+  value: string;
+};
+
 const Generator = () => {
   const [width, setWidth] = useState("");
   const [height, setHeight] = useState("");
 
-  const [promptObject, setPromptObject] = useState<{ [key: string]: string[] }>(
-    {
-      base: [],
-      numberOfPeople: [],
-      body: [],
-    }
-  );
+  const [promptArray, setPromptArray] = useState<Object[]>([]);
 
   const [lastImageInfo, setLastImageInfo] = useState<ImageInfo | null>(null);
 
   const utils = api.useContext();
+
+  const { isBlur } = useContext(BlurImagesContext);
 
   const postImage = api.example.postImage.useMutation({
     onSuccess() {
@@ -52,16 +54,9 @@ const Generator = () => {
   const handleSubmit = (e: any) => {
     e.preventDefault();
 
-    // Extract all values from the promptObject
-    const allValues = Object.values(promptObject);
+    const valuesArray = promptArray.map((obj) => obj.value);
 
-    // Flatten the array of arrays into a single array using concat and spread operator
-    const flattenedArray = ([] as string[]).concat(...allValues);
-
-    // Create the comma-separated string
-    const prompt = flattenedArray.join(",");
-
-    console.log(prompt);
+    const prompt = valuesArray.join(", ");
 
     postImage.mutate({
       prompt,
@@ -73,21 +68,15 @@ const Generator = () => {
     });
   };
 
-  const handleChipClick = (key: string, value: string) => {
-    if (promptObject[key]?.includes(value)) {
-      setPromptObject((prevPromptObject) => ({
-        ...prevPromptObject,
-        [key]: prevPromptObject[key]?.filter(
-          (chip) => chip !== value
-        ) as string[],
-      }));
+  const handleChipClick = (category: string, value: string) => {
+    if (promptArray.find((obj) => obj.value === value)) {
+      setPromptArray(promptArray.filter((obj) => obj.value !== value));
     } else {
-      setPromptObject((prevPromptObject) => ({
-        ...prevPromptObject,
-        [key]: [...(prevPromptObject[key] ?? []), value],
-      }));
+      setPromptArray([...promptArray, { category, value }]);
     }
   };
+
+  console.log(promptArray);
 
   return (
     <Layout>
@@ -112,80 +101,39 @@ const Generator = () => {
             gap: "30px",
           }}
         >
-          <Box sx={{ width: "100%" }}>
-            <Box
-              sx={{
-                fontSize: "24px",
-                fontWeight: "bold",
-                borderBottom: "2px solid #e8590c",
-                paddingBottom: "8px",
-                textTransform: "uppercase",
-                fontFamily: "Arial, sans-serif",
-                letterSpacing: "2px",
-                marginBottom: "1rem",
-              }}
-            >
-              Base
-            </Box>
-            <Box sx={{ display: "flex", gap: "1rem", flexWrap: "wrap" }}>
-              {chipsObject.base.map((value, i) => (
-                <Chip key={i} onClick={() => handleChipClick("base", value)}>
-                  {value}
-                </Chip>
-              ))}
-            </Box>
-          </Box>
-
-          <Box sx={{ width: "100%" }}>
-            <Box
-              sx={{
-                fontSize: "24px",
-                fontWeight: "bold",
-                borderBottom: "2px solid #e8590c",
-                paddingBottom: "8px",
-                textTransform: "uppercase",
-                fontFamily: "Arial, sans-serif",
-                letterSpacing: "2px",
-                marginBottom: "1rem",
-              }}
-            >
-              Number of people
-            </Box>
-            <Box sx={{ display: "flex", gap: "1rem", flexWrap: "wrap" }}>
-              {chipsObject.numberOfPeople.map((value, i) => (
-                <Chip
-                  key={i}
-                  onClick={() => handleChipClick("numberOfPeople", value)}
+          {Object.entries(chipsObject).map(([category, arrayOfChips]) => {
+            return (
+              <Box sx={{ width: "100%" }}>
+                <Box
+                  sx={{
+                    fontSize: "24px",
+                    fontWeight: "bold",
+                    borderBottom: "2px solid #e8590c",
+                    paddingBottom: "8px",
+                    textTransform: "uppercase",
+                    fontFamily: "Arial, sans-serif",
+                    letterSpacing: "2px",
+                    marginBottom: "1rem",
+                  }}
                 >
-                  {value}
-                </Chip>
-              ))}
-            </Box>
-          </Box>
-
-          <Box sx={{ width: "100%" }}>
-            <Box
-              sx={{
-                fontSize: "24px",
-                fontWeight: "bold",
-                borderBottom: "2px solid #e8590c",
-                paddingBottom: "8px",
-                textTransform: "uppercase",
-                fontFamily: "Arial, sans-serif",
-                letterSpacing: "2px",
-                marginBottom: "1rem",
-              }}
-            >
-              Body
-            </Box>
-            <Box sx={{ display: "flex", gap: "1rem", flexWrap: "wrap" }}>
-              {chipsObject.body.map((value, i) => (
-                <Chip key={i} onClick={() => handleChipClick("body", value)}>
-                  {value}
-                </Chip>
-              ))}
-            </Box>
-          </Box>
+                  {categoryTitle[category as keyof typeof categoryTitle]}
+                </Box>
+                <Box sx={{ display: "flex", gap: "1rem", flexWrap: "wrap" }}>
+                  {arrayOfChips.map((value, i) => (
+                    <Chip
+                      key={i}
+                      checked={Boolean(
+                        promptArray.find((obj) => obj.value === value)
+                      )}
+                      onClick={() => handleChipClick(category, value)}
+                    >
+                      {value}
+                    </Chip>
+                  ))}
+                </Box>
+              </Box>
+            );
+          })}
 
           <Box sx={{ display: "flex", gap: "1rem" }}>
             <Select
@@ -227,12 +175,15 @@ const Generator = () => {
               animate={postImage.isLoading}
             />
           ) : (
-            <Image
-              src={imageData.imageUrl}
-              width={parseInt(width, 10)}
-              height={parseInt(height, 10)}
-              alt="Image generated"
-            />
+            <Box sx={{ position: "relative" }}>
+              <Image
+                src={imageData.imageUrl}
+                width={parseInt(width, 10)}
+                height={parseInt(height, 10)}
+                alt="Image generated"
+              />
+              {isBlur && <Overlay blur={40}></Overlay>}
+            </Box>
           )}
         </Box>
       </Box>
@@ -244,6 +195,157 @@ export default Generator;
 
 const chipsObject = {
   base: ["Man", "Woman", "Man + Woman", "Man + Man", "Woman + Woman"],
-  numberOfPeople: ["One", "Two", "Several"],
-  body: ["Busty", "Beautiful", "Tattoo", "Big ass", "Muscular", "Chubby"],
+  numberOfPeople: ["One person", "Two people", "Several people"],
+  body: [
+    "Busty",
+    "Beautiful",
+    "Tattoo",
+    "Muscular",
+    "Chubby",
+    "Small tits",
+    "Huge boobs",
+    "Lipstick",
+    "Big ass",
+    "Small ass",
+    "Skinny",
+    "Fat",
+    "Tall",
+    "Short",
+    "Perfect body",
+    "Pubic hair",
+    "Short hair",
+    "Long hair",
+    "Curly hair",
+    "Pregnant",
+    "Tanned skin",
+    "Dark skin",
+  ],
+  age: ["18 y/o", "20 y/o", "30 y/o", "40 y/o", "50 y/o", "60 y/o", "70 y/o"],
+  face: [
+    "Happy",
+    "Sad",
+    "Serious",
+    "Laughing",
+    "Orgasm",
+    "Seductive",
+    "Pouting lips",
+    "Socked",
+    "Angry",
+  ],
+  hairColor: [
+    "Blonde",
+    "Brunette",
+    "Ginger",
+    "White hair",
+    "Black hair",
+    "Blue hair",
+    "Green hair",
+    "Purple hair",
+    "Pink hair",
+  ],
+  hairStyle: [
+    "Bobcut",
+    "Pigtails",
+    "Hair bun",
+    "Messy",
+    "Bangs",
+    "Braided",
+    "Slicked",
+    "Straight",
+  ],
+  ethnicity: [
+    "African",
+    "Arabic",
+    "Asian",
+    "Brazilian",
+    "British",
+    "Chinese",
+    "Czech",
+    "Dutch",
+    "Egyption",
+    "French",
+    "German",
+    "Greek",
+    "Irish",
+    "Indian",
+    "Italian",
+    "Thai",
+    "Japanese",
+  ],
+  setting: [
+    "Bar",
+    "Bathroom",
+    "Beach",
+    "Bedroom",
+    "Bus",
+    "Cafe",
+    "Car",
+    "Changing room",
+    "Church",
+    "Gym",
+    "Hospital",
+    "Jungle",
+    "Mall",
+    "Kitchen",
+    "Office",
+    "Pool",
+    "Shower",
+    "Strip club",
+    "Party",
+    "Tent",
+    "Couch",
+    "Hot tub",
+  ],
+  view: ["Front view", "Side view", "Back view", "Close-up view"],
+  action: [
+    "Yoga",
+    "Sleeping",
+    "Cooking",
+    "Gaming",
+    "Bending over",
+    "Cumshot",
+    "Spreading legs",
+    "Working out",
+  ],
+  clothing: [
+    "Nude",
+    "BDSM",
+    "Bikini",
+    "Choker",
+    "Clown",
+    "Devil",
+    "Casual",
+    "Boots",
+    "Cosplay",
+    "Doctor",
+    "Firefighter",
+    "Dominatrix",
+    "Dress",
+    "Halloween",
+    "High heels",
+    "Hijab",
+    "Kimono",
+    "Maid",
+    "Lumberjack",
+    "Micro skirt",
+    "Police",
+    "Underwear",
+    "Viking",
+    "Yoga pants",
+  ],
+};
+
+const categoryTitle = {
+  numberOfPeople: "Number of people",
+  base: "Base",
+  body: "Body",
+  age: "Age",
+  face: "Face",
+  hairColor: "Hair color",
+  hairStyle: "Hair style",
+  ethnicity: "Ethnicity",
+  setting: "Setting",
+  view: "View",
+  clothing: "Clothing",
+  action: "Action",
 };
