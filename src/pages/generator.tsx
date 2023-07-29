@@ -10,7 +10,7 @@ interface ImageInfo {
   height: number;
 }
 
-type Object = {
+type PromptObject = {
   category: string;
   value: string;
 };
@@ -19,7 +19,7 @@ const Generator = () => {
   const [width, setWidth] = useState("");
   const [height, setHeight] = useState("");
 
-  const [promptArray, setPromptArray] = useState<Object[]>([]);
+  const [promptArray, setPromptArray] = useState<PromptObject[]>([]);
 
   const [lastImageInfo, setLastImageInfo] = useState<ImageInfo | null>(null);
 
@@ -54,13 +54,30 @@ const Generator = () => {
   const handleSubmit = (e: any) => {
     e.preventDefault();
 
-    const valuesArray = promptArray.map((obj) => obj.value);
+    const promptObj: any = {};
 
-    const prompt = valuesArray.join(", ");
+    for (const el of promptArray) {
+      if (promptObj[el.category]) {
+        promptObj[el.category].push(el.value);
+      } else {
+        promptObj[el.category] = [el.value];
+      }
+    }
 
-    postImage.mutate({
-      prompt,
-    });
+    const prompt = Object.entries(promptObj)
+      .map(
+        ([category, valuesArray]) =>
+          `${(categoryTitle as any)[category]}: ${(
+            valuesArray as string[]
+          ).join(", ")}`
+      )
+      .join(", ");
+
+    console.log(prompt);
+
+    // postImage.mutate({
+    //   prompt,
+    // });
 
     setLastImageInfo({
       width: parseInt(width, 10),
@@ -91,8 +108,6 @@ const Generator = () => {
       setPromptArray([...promptArray, { category, value }]);
     }
   };
-
-  console.log(promptArray);
 
   return (
     <Layout>

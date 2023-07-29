@@ -27,7 +27,8 @@ export const exampleRouter = createTRPCRouter({
         {
           input: {
             prompt: input.prompt,
-            negative_prompt: "",
+            negative_prompt:
+              "((blurry)), duplicate, deformed, cartoon, animated, render, missing limbs, child, childish",
             width: 512,
             height: 512,
           },
