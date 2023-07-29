@@ -1,4 +1,4 @@
-import { Box, Button, Chip, Overlay, Select, Skeleton } from "@mantine/core";
+import { Box, Button, Chip, Overlay, Skeleton } from "@mantine/core";
 import Image from "next/image";
 import { useContext, useState } from "react";
 import { BlurImagesContext } from "~/components/BlurImagesProvider";
@@ -34,22 +34,6 @@ const Generator = () => {
   });
 
   const imageData = postImage.data; // Returns the data from the created image in Prisma
-
-  const values = [
-    { value: "128", label: "128" },
-    { value: "256", label: "256" },
-    { value: "384", label: "384" },
-    { value: "448", label: "448" },
-    { value: "512", label: "512" },
-    { value: "576", label: "576" },
-    { value: "640", label: "640" },
-    { value: "704", label: "704" },
-    { value: "768", label: "768" },
-    { value: "832", label: "832" },
-    { value: "896", label: "896" },
-    { value: "960", label: "960" },
-    { value: "1024", label: "1024" },
-  ];
 
   const handleSubmit = (e: any) => {
     e.preventDefault();
@@ -166,25 +150,11 @@ const Generator = () => {
             );
           })}
 
-          <Box sx={{ display: "flex", gap: "1rem" }}>
-            <Select
-              data={values}
-              label="Width"
-              sx={{ width: "100px" }}
-              onSearchChange={setWidth}
-              searchValue={width}
-              defaultValue="512"
-            />
-            <Select
-              data={values}
-              label="Height"
-              sx={{ width: "100px" }}
-              onSearchChange={setHeight}
-              searchValue={height}
-              defaultValue="512"
-            />
-          </Box>
-          <Button type="submit" loading={postImage.isLoading}>
+          <Button
+            sx={{ position: "fixed", left: "50%", bottom: "5%" }}
+            type="submit"
+            loading={postImage.isLoading}
+          >
             {postImage.isLoading ? "Gerando" : "Gerar"}
           </Button>
         </Box>
@@ -200,10 +170,8 @@ const Generator = () => {
         >
           {postImage.isLoading || !imageData ? (
             <Skeleton
-              height={
-                lastImageInfo ? `${lastImageInfo.height}px` : `${height}px`
-              }
-              width={lastImageInfo ? `${lastImageInfo.width}px` : `${width}px`}
+              height={lastImageInfo ? `${lastImageInfo.height}px` : `512px`}
+              width={lastImageInfo ? `${lastImageInfo.width}px` : `512px`}
               animate={postImage.isLoading}
             />
           ) : (
