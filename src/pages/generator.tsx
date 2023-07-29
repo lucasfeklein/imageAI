@@ -81,11 +81,8 @@ const Generator = () => {
       const unselectAllCategoryArray = promptArray.filter(
         (obj) => obj.category !== category
       );
-
-      return setPromptArray([...unselectAllCategoryArray, { category, value }]);
-    }
-
-    if (promptArray.find((obj) => obj.value === value)) {
+      setPromptArray([...unselectAllCategoryArray, { category, value }]);
+    } else if (promptArray.find((obj) => obj.value === value)) {
       setPromptArray(promptArray.filter((obj) => obj.value !== value));
     } else {
       setPromptArray([...promptArray, { category, value }]);
