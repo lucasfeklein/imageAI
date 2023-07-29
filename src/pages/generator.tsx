@@ -69,6 +69,22 @@ const Generator = () => {
   };
 
   const handleChipClick = (category: string, value: string) => {
+    const singleChipSelection = [
+      "base",
+      "hairColor",
+      "numberOfPeople",
+      "hairStyle",
+      "age",
+    ].includes(category);
+
+    if (singleChipSelection) {
+      const unselectAllCategoryArray = promptArray.filter(
+        (obj) => obj.category !== category
+      );
+
+      return setPromptArray([...unselectAllCategoryArray, { category, value }]);
+    }
+
     if (promptArray.find((obj) => obj.value === value)) {
       setPromptArray(promptArray.filter((obj) => obj.value !== value));
     } else {
@@ -103,7 +119,7 @@ const Generator = () => {
         >
           {Object.entries(chipsObject).map(([category, arrayOfChips]) => {
             return (
-              <Box sx={{ width: "100%" }}>
+              <Box sx={{ width: "100%" }} key={category}>
                 <Box
                   sx={{
                     fontSize: "24px",
@@ -163,7 +179,8 @@ const Generator = () => {
             height: "100%",
             display: "flex",
             justifyContent: "center",
-            alignItems: "center",
+            alignSelf: "flex-start",
+            marginTop: "100px",
           }}
         >
           {postImage.isLoading || !imageData ? (
