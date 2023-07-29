@@ -37,41 +37,40 @@ const Login = () => {
         <Loader />
       </Center>
     );
-  } else {
-    return (
-      <Box
-        component="form"
-        onSubmit={handleSubmit}
+  }
+  return (
+    <Box
+      component="form"
+      onSubmit={handleSubmit}
+      sx={{
+        height: "100vh",
+        display: "flex",
+        justifyContent: "center",
+        alignItems: "center",
+      }}
+    >
+      <Card
+        withBorder
         sx={{
-          height: "100vh",
+          width: "300px",
           display: "flex",
-          justifyContent: "center",
-          alignItems: "center",
+          flexDirection: "column",
+          gap: "0.5rem",
         }}
       >
-        <Card
-          withBorder
-          sx={{
-            width: "300px",
-            display: "flex",
-            flexDirection: "column",
-            gap: "0.5rem",
-          }}
-        >
-          <TextInput
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            placeholder="email@exemplo.com"
-            label="Email"
-            required
-          />
-          <Button type="submit" loading={isLoading}>
-            {isLoading ? "Enviando" : "Enviar"}
-          </Button>
-        </Card>
-      </Box>
-    );
-  }
+        <TextInput
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}
+          placeholder="email@exemplo.com"
+          label="Email"
+          required
+        />
+        <Button type="submit" loading={isLoading}>
+          {isLoading ? "Enviando" : "Enviar"}
+        </Button>
+      </Card>
+    </Box>
+  );
 };
 
 export default Login;
