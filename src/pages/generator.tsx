@@ -107,7 +107,7 @@ const Generator = () => {
           sx={{
             width: "50%",
             height: "100%",
-            padding: "100px",
+            padding: "70px",
             display: "flex",
             flexDirection: "column",
             justifyContent: "center",
