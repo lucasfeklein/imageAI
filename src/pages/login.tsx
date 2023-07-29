@@ -1,8 +1,9 @@
-import { Box, Button, Card, TextInput } from "@mantine/core";
+import { Box, Button, Card, Center, Loader, TextInput } from "@mantine/core";
 import { notifications } from "@mantine/notifications";
 import { IconCheck } from "@tabler/icons-react";
-import { signIn } from "next-auth/react";
-import { useState } from "react";
+import { signIn, useSession } from "next-auth/react";
+import { useRouter } from "next/router";
+import { useEffect, useState } from "react";
 
 const Login = () => {
   const [email, setEmail] = useState("");
@@ -20,39 +21,57 @@ const Login = () => {
     setIsLoading(false);
   };
 
-  return (
-    <Box
-      component="form"
-      onSubmit={handleSubmit}
-      sx={{
-        height: "100vh",
-        display: "flex",
-        justifyContent: "center",
-        alignItems: "center",
-      }}
-    >
-      <Card
-        withBorder
+  const router = useRouter();
+  const { status } = useSession();
+
+  useEffect(() => {
+    console.log(status);
+    if (status === "authenticated") {
+      router.push("/");
+    }
+  }, [status]);
+
+  if (status !== "unauthenticated") {
+    return (
+      <Center h={"100vh"}>
+        <Loader />
+      </Center>
+    );
+  } else {
+    return (
+      <Box
+        component="form"
+        onSubmit={handleSubmit}
         sx={{
-          width: "300px",
+          height: "100vh",
           display: "flex",
-          flexDirection: "column",
-          gap: "0.5rem",
+          justifyContent: "center",
+          alignItems: "center",
         }}
       >
-        <TextInput
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
-          placeholder="email@exemplo.com"
-          label="Email"
-          required
-        />
-        <Button type="submit" loading={isLoading}>
-          {isLoading ? "Enviando" : "Enviar"}
-        </Button>
-      </Card>
-    </Box>
-  );
+        <Card
+          withBorder
+          sx={{
+            width: "300px",
+            display: "flex",
+            flexDirection: "column",
+            gap: "0.5rem",
+          }}
+        >
+          <TextInput
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            placeholder="email@exemplo.com"
+            label="Email"
+            required
+          />
+          <Button type="submit" loading={isLoading}>
+            {isLoading ? "Enviando" : "Enviar"}
+          </Button>
+        </Card>
+      </Box>
+    );
+  }
 };
 
 export default Login;

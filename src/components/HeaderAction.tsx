@@ -14,7 +14,7 @@ import {
 import { MantineLogo } from "@mantine/ds";
 import { useDisclosure } from "@mantine/hooks";
 import { IconChevronDown, IconEye, IconEyeOff } from "@tabler/icons-react";
-import { useSession } from "next-auth/react";
+import { signOut, useSession } from "next-auth/react";
 import Link from "next/link";
 import { useContext } from "react";
 import { BlurImagesContext } from "./BlurImagesProvider";
@@ -150,11 +150,17 @@ export function HeaderAction({ links }: HeaderActionProps) {
               <IconEye onClick={() => setIsBlur(!isBlur)} />
             )}
           </ActionIcon>
-          <Link href="/login">
-            <Button radius="xl" h={30}>
-              {sessionData ? "Sair" : "Entrar"}
+          {sessionData ? (
+            <Button radius="xl" h={30} onClick={() => signOut()}>
+              Sair
             </Button>
-          </Link>
+          ) : (
+            <Link href="/login">
+              <Button radius="xl" h={30}>
+                Entrar
+              </Button>
+            </Link>
+          )}
         </Box>
       </Container>
     </Header>
