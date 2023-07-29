@@ -115,11 +115,15 @@ const Generator = () => {
             gap: "30px",
           }}
         >
-          <Button variant="light" onClick={handleClearAll}>
-            <Box sx={{ display: "flex", gap: "0.5rem" }}>
-              Clear All <IconX size={15} />
-            </Box>
-          </Button>
+          <Box sx={{ height: "30px" }}>
+            {promptArray.length > 0 && (
+              <Button variant="light" onClick={handleClearAll}>
+                <Box sx={{ display: "flex", gap: "0.5rem" }}>
+                  Clear All <IconX size={15} />
+                </Box>
+              </Button>
+            )}
+          </Box>
           {Object.entries(chipsObject).map(([category, arrayOfChips]) => {
             return (
               <Box sx={{ width: "100%" }} key={category}>
@@ -239,7 +243,7 @@ const chipsObject = {
     "Orgasm",
     "Seductive",
     "Pouting lips",
-    "Socked",
+    "Shocked",
     "Angry",
   ],
   hairColor: [
