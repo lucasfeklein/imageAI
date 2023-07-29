@@ -1,4 +1,5 @@
 import { Box, Button, Chip, Overlay, Skeleton } from "@mantine/core";
+import { IconX } from "@tabler/icons-react";
 import Image from "next/image";
 import { useContext, useState } from "react";
 import { BlurImagesContext } from "~/components/BlurImagesProvider";
@@ -16,12 +17,7 @@ type PromptObject = {
 };
 
 const Generator = () => {
-  const [width, setWidth] = useState("");
-  const [height, setHeight] = useState("");
-
   const [promptArray, setPromptArray] = useState<PromptObject[]>([]);
-
-  const [lastImageInfo, setLastImageInfo] = useState<ImageInfo | null>(null);
 
   const utils = api.useContext();
 
@@ -59,14 +55,13 @@ const Generator = () => {
 
     console.log(prompt);
 
-    // postImage.mutate({
-    //   prompt,
-    // });
-
-    setLastImageInfo({
-      width: parseInt(width, 10),
-      height: parseInt(height, 10),
+    postImage.mutate({
+      prompt,
     });
+  };
+
+  const handleClearAll = () => {
+    setPromptArray([]);
   };
 
   const handleChipClick = (category: string, value: string) => {
@@ -76,9 +71,13 @@ const Generator = () => {
       "numberOfPeople",
       "hairStyle",
       "age",
+      "setting",
     ].includes(category);
 
-    if (singleChipSelection) {
+    if (
+      singleChipSelection &&
+      !promptArray.find((obj) => obj.value === value)
+    ) {
       const unselectAllCategoryArray = promptArray.filter(
         (obj) => obj.category !== category
       );
@@ -116,6 +115,11 @@ const Generator = () => {
             gap: "30px",
           }}
         >
+          <Button variant="light" onClick={handleClearAll}>
+            <Box sx={{ display: "flex", gap: "0.5rem" }}>
+              Clear All <IconX size={15} />
+            </Box>
+          </Button>
           {Object.entries(chipsObject).map(([category, arrayOfChips]) => {
             return (
               <Box sx={{ width: "100%" }} key={category}>
@@ -170,16 +174,16 @@ const Generator = () => {
         >
           {postImage.isLoading || !imageData ? (
             <Skeleton
-              height={lastImageInfo ? `${lastImageInfo.height}px` : `512px`}
-              width={lastImageInfo ? `${lastImageInfo.width}px` : `512px`}
+              height="512px"
+              width="512px"
               animate={postImage.isLoading}
             />
           ) : (
             <Box sx={{ position: "relative" }}>
               <Image
                 src={imageData.imageUrl}
-                width={parseInt(width, 10)}
-                height={parseInt(height, 10)}
+                width={512}
+                height={512}
                 alt="Image generated"
               />
               {isBlur && <Overlay blur={40}></Overlay>}
@@ -194,7 +198,13 @@ const Generator = () => {
 export default Generator;
 
 const chipsObject = {
-  base: ["Man", "Woman", "Man + Woman", "Man + Man", "Woman + Woman"],
+  base: [
+    "Man",
+    "Woman",
+    "Man having sex with woman",
+    "Man having sex with man",
+    "Woman having sex with woman",
+  ],
   numberOfPeople: ["One person", "Two people", "Several people"],
   body: [
     "Busty",
@@ -306,6 +316,8 @@ const chipsObject = {
     "Cumshot",
     "Spreading legs",
     "Working out",
+    "Blow job",
+    "Creampie",
   ],
   clothing: [
     "Nude",
