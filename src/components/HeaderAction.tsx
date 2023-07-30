@@ -140,7 +140,7 @@ export function HeaderAction({ links }: HeaderActionProps) {
         >
           {sessionData && (
             <span style={{ marginRight: "0.5rem" }}>
-              {sessionData?.user.email}
+              <Link href="/user">{sessionData?.user.email}</Link>
             </span>
           )}
           <ActionIcon>

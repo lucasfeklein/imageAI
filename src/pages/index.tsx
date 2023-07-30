@@ -1,7 +1,7 @@
 import { Box } from "@mantine/core";
 import { signIn, signOut, useSession } from "next-auth/react";
 import Head from "next/head";
-import Grid from "~/components/ImagesGrid";
+import ImagesGrid from "~/components/ImagesGrid";
 import Layout from "~/components/Layout";
 import { api } from "~/utils/api";
 
@@ -17,7 +17,7 @@ export default function Home() {
       </Head>
       <Box component="main">
         <Layout>
-          <Grid />
+          <ImagesGrid onlyUser={false} />
         </Layout>
       </Box>
     </>

@@ -5,9 +5,16 @@ import Masonry, { ResponsiveMasonry } from "react-responsive-masonry";
 import { api } from "~/utils/api";
 import { BlurImagesContext } from "./BlurImagesProvider";
 
-const ImagesGrid = () => {
+interface ImagesGridProps {
+  onlyUser: boolean;
+}
+
+const ImagesGrid: React.FC<ImagesGridProps> = ({ onlyUser }) => {
   const { isBlur } = useContext(BlurImagesContext);
-  const { data } = api.example.getImages.useQuery();
+
+  const { data } = api.example.getImages.useQuery({
+    onlyUser,
+  });
 
   return (
     <ResponsiveMasonry columnsCountBreakPoints={{ 350: 2, 750: 3, 900: 4 }}>

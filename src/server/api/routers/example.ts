@@ -1,19 +1,33 @@
 import Replicate from "replicate";
 import { z } from "zod";
 import { env } from "~/env.mjs";
-import { createTRPCRouter, publicProcedure } from "~/server/api/trpc";
+import {
+  createTRPCRouter,
+  protectedProcedure,
+  publicProcedure,
+} from "~/server/api/trpc";
 import downloadAndUploadImage from "~/utils/uploadImage";
 
 export const exampleRouter = createTRPCRouter({
-  getImages: publicProcedure.query(({ ctx }) => {
-    return ctx.prisma.image.findMany({
-      orderBy: {
-        createdAt: "desc",
-      },
-    });
-  }),
+  getImages: publicProcedure
+    .input(z.object({ onlyUser: z.boolean() }))
+    .query(({ ctx, input }) => {
+      if (input.onlyUser) {
+        return ctx.prisma.image.findMany({
+          where: {
+            userId: ctx.session?.user.id,
+          },
+        });
+      }
 
-  postImage: publicProcedure
+      return ctx.prisma.image.findMany({
+        orderBy: {
+          createdAt: "desc",
+        },
+      });
+    }),
+
+  postImage: protectedProcedure
     .input(z.object({ prompt: z.string() }))
     .mutation(async ({ ctx, input }) => {
       const replicate = new Replicate({
@@ -44,6 +58,7 @@ export const exampleRouter = createTRPCRouter({
       return ctx.prisma.image.create({
         data: {
           imageUrl: `https://pub-29f672e007514c6d9cf62f0fb4d73986.r2.dev/${imageKey}`,
+          userId: ctx.session?.user.id,
         },
       });
     }),
