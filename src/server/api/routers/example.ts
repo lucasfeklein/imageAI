@@ -17,6 +17,9 @@ export const exampleRouter = createTRPCRouter({
           where: {
             userId: ctx.session?.user.id,
           },
+          orderBy: {
+            createdAt: "desc",
+          },
         });
       }
 
