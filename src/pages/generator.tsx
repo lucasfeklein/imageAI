@@ -173,7 +173,7 @@ const Generator = () => {
             marginTop: "100px",
           }}
         >
-          {postImage.isLoading || !imageData ? (
+          {postImage.isLoading || !imageData?.imageUrl ? (
             <Skeleton
               height="512px"
               width="512px"
