@@ -37,6 +37,12 @@ export const exampleRouter = createTRPCRouter({
         auth: env.REPLICATE_API_TOKEN,
       });
 
+      const imageLoading = await ctx.prisma.image.create({
+        data: {
+          userId: ctx.session.user.id,
+        },
+      });
+
       console.log("start generating image");
 
       const output = (await replicate.run(
@@ -58,10 +64,12 @@ export const exampleRouter = createTRPCRouter({
 
       const imageKey = await downloadAndUploadImage(imageUrl);
 
-      return ctx.prisma.image.create({
+      return ctx.prisma.image.update({
+        where: {
+          id: imageLoading.id,
+        },
         data: {
           imageUrl: `https://pub-29f672e007514c6d9cf62f0fb4d73986.r2.dev/${imageKey}`,
-          userId: ctx.session?.user.id,
         },
       });
     }),

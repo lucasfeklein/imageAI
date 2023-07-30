@@ -69,7 +69,7 @@ model VerificationToken {
 
 model Image {
     id            String    @id @default(cuid())
-    imageUrl      String
+    imageUrl      String?
     createdAt     DateTime  @default(now())
     userId        String?
     user          User?     @relation(fields: [userId], references: [id], onDelete: Cascade)

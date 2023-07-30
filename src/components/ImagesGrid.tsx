@@ -1,4 +1,4 @@
-import { Box, Overlay } from "@mantine/core";
+import { Box, Overlay, Skeleton } from "@mantine/core";
 import Image from "next/image";
 import { useContext } from "react";
 import Masonry, { ResponsiveMasonry } from "react-responsive-masonry";
@@ -16,21 +16,31 @@ const ImagesGrid: React.FC<ImagesGridProps> = ({ onlyUser }) => {
     onlyUser,
   });
 
+  const dataFilter = data?.filter((image) =>
+    onlyUser ? true : image.imageUrl !== null
+  ) as {
+    imageUrl: string;
+  }[];
+
   return (
     <ResponsiveMasonry columnsCountBreakPoints={{ 350: 2, 750: 3, 900: 4 }}>
       <Masonry gutter="0.5rem">
-        {data?.map((image, i) => (
-          <Box key={i} sx={{ position: "relative" }}>
-            <Image
-              src={image.imageUrl}
-              alt={`Image ${i}`}
-              width={120}
-              height={120}
-              layout="responsive"
-            />
-            {isBlur && <Overlay blur={40}></Overlay>}
-          </Box>
-        ))}
+        {dataFilter?.map((image, i) =>
+          image.imageUrl ? (
+            <Box key={i} sx={{ position: "relative" }}>
+              <Image
+                src={image.imageUrl}
+                alt={`Image ${i}`}
+                width={120}
+                height={120}
+                layout="responsive"
+              />
+              {isBlur && <Overlay blur={40}></Overlay>}
+            </Box>
+          ) : (
+            <Skeleton height="100%" width="100%" />
+          )
+        )}
       </Masonry>
     </ResponsiveMasonry>
   );
