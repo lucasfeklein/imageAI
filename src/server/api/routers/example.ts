@@ -8,9 +8,9 @@ import {
 } from "~/server/api/trpc";
 import downloadAndUploadImage from "~/utils/uploadImage";
 
-export const exampleRouter = createTRPCRouter({
+export const imageRouter = createTRPCRouter({
   getImages: publicProcedure
-    .input(z.object({ onlyUser: z.boolean() }))
+    .input(z.object({ onlyUser: z.boolean(), cursor: z.number().nullish() }))
     .query(({ ctx, input }) => {
       if (input.onlyUser) {
         return ctx.prisma.image.findMany({
