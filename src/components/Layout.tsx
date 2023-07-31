@@ -7,7 +7,7 @@ const Layout = ({ children }: { children: ReactNode }) => {
       <HeaderAction
         links={[
           { label: "Home", link: "/" },
-          { label: "Gerador", link: "/generator" },
+          { label: "Generator", link: "/generator" },
         ]}
       />
       {children}

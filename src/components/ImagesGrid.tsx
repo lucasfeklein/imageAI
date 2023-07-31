@@ -22,7 +22,7 @@ const ImagesGrid: React.FC<ImagesGridProps> = ({ onlyUser }) => {
       }
     );
 
-  const itemsArray = data?.pages.map(({ items }) => items).flat(1);
+  const itemsArray = data?.pages.map(({ items }) => items).flat();
 
   const dataFilter = itemsArray?.filter((image) =>
     onlyUser ? true : image.imageUrl !== null
