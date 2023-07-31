@@ -152,12 +152,12 @@ export function HeaderAction({ links }: HeaderActionProps) {
           </ActionIcon>
           {sessionData ? (
             <Button radius="xl" h={30} onClick={() => signOut()}>
-              Sair
+              Sign Out
             </Button>
           ) : (
             <Link href="/login">
               <Button radius="xl" h={30}>
-                Entrar
+                Sign In
               </Button>
             </Link>
           )}

@@ -1,5 +1,7 @@
 import { Box, Button, Chip, Overlay, Skeleton } from "@mantine/core";
+import { notifications } from "@mantine/notifications";
 import { IconX } from "@tabler/icons-react";
+import { useSession } from "next-auth/react";
 import Image from "next/image";
 import { useContext, useState } from "react";
 import { BlurImagesContext } from "~/components/BlurImagesProvider";
@@ -19,6 +21,8 @@ type PromptObject = {
 const Generator = () => {
   const [promptArray, setPromptArray] = useState<PromptObject[]>([]);
 
+  const { data: sessionData } = useSession();
+
   const utils = api.useContext();
 
   const { isBlur } = useContext(BlurImagesContext);
@@ -33,6 +37,14 @@ const Generator = () => {
 
   const handleSubmit = (e: any) => {
     e.preventDefault();
+
+    if (!sessionData) {
+      notifications.show({
+        title: "Unauthorized",
+        message: "You need to Sign In",
+        icon: <IconX />,
+      });
+    }
 
     const promptObj: any = {};
 
