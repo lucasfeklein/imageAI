@@ -13,7 +13,7 @@ import {
 } from "@mantine/core";
 import { MantineLogo } from "@mantine/ds";
 import { useDisclosure } from "@mantine/hooks";
-import { IconChevronDown, IconEye, IconEyeOff } from "@tabler/icons-react";
+import { IconChevronDown, IconEye, IconEyeOff, IconPhoto } from "@tabler/icons-react";
 import { signOut, useSession } from "next-auth/react";
 import Link from "next/link";
 import { useContext } from "react";
@@ -139,9 +139,19 @@ export function HeaderAction({ links }: HeaderActionProps) {
           }}
         >
           {sessionData && (
-            <span style={{ marginRight: "0.5rem" }}>
-              <Link href="/user">{sessionData?.user.email}</Link>
-            </span>
+            <Menu>
+              <Menu.Target>
+              <Button variant="subtle">{sessionData?.user.email}</Button>
+              </Menu.Target>
+
+              <Menu.Dropdown>
+                <Menu.Item icon={<IconPhoto/>}>
+                  <Link href='/user'>
+                  My photos
+                  </Link>
+                </Menu.Item>
+              </Menu.Dropdown>
+            </Menu>
           )}
           <ActionIcon>
             {isBlur ? (
