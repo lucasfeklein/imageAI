@@ -18,6 +18,13 @@ export const imageRouter = createTRPCRouter({
 
       const items = await ctx.prisma.image.findMany({
         where,
+        include: {
+          favorites: {
+            where: {
+              userId: ctx.session?.user.id,
+            },
+          },
+        },
         take: 20 + 1, // get an extra item at the end which we'll use as next cursor
         cursor: cursor ? { id: cursor } : undefined,
         orderBy: {
@@ -75,5 +82,38 @@ export const imageRouter = createTRPCRouter({
           imageUrl: `https://pub-29f672e007514c6d9cf62f0fb4d73986.r2.dev/${imageKey}`,
         },
       });
+    }),
+
+  favoriteImage: protectedProcedure
+    .input(z.object({ imageId: z.string() }))
+    .mutation(async ({ ctx, input }) => {
+      const { imageId } = input;
+
+      const findImage = await ctx.prisma.favorite.findUnique({
+        where: {
+          userId_imageId: {
+            imageId: imageId,
+            userId: ctx.session.user.id,
+          },
+        },
+      });
+
+      if (findImage) {
+        return ctx.prisma.favorite.delete({
+          where: {
+            userId_imageId: {
+              imageId: imageId,
+              userId: ctx.session.user.id,
+            },
+          },
+        });
+      } else {
+        return ctx.prisma.favorite.create({
+          data: {
+            imageId: imageId,
+            userId: ctx.session.user.id,
+          },
+        });
+      }
     }),
 });
