@@ -13,7 +13,13 @@ import {
 } from "@mantine/core";
 import { MantineLogo } from "@mantine/ds";
 import { useDisclosure } from "@mantine/hooks";
-import { IconChevronDown, IconEye, IconEyeOff, IconPhoto } from "@tabler/icons-react";
+import {
+  IconChevronDown,
+  IconEye,
+  IconEyeOff,
+  IconHeart,
+  IconPhoto,
+} from "@tabler/icons-react";
 import { signOut, useSession } from "next-auth/react";
 import Link from "next/link";
 import { useContext } from "react";
@@ -141,14 +147,15 @@ export function HeaderAction({ links }: HeaderActionProps) {
           {sessionData && (
             <Menu>
               <Menu.Target>
-              <Button variant="subtle">{sessionData?.user.email}</Button>
+                <Button variant="subtle">{sessionData?.user.email}</Button>
               </Menu.Target>
 
               <Menu.Dropdown>
-                <Menu.Item icon={<IconPhoto/>}>
-                  <Link href='/user'>
-                  My photos
-                  </Link>
+                <Menu.Item icon={<IconPhoto />}>
+                  <Link href="/user">My photos</Link>
+                </Menu.Item>
+                <Menu.Item icon={<IconHeart />}>
+                  <Link href="/favorites">Favorite photos</Link>
                 </Menu.Item>
               </Menu.Dropdown>
             </Menu>

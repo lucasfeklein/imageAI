@@ -1,12 +1,12 @@
 import { Box } from "@mantine/core";
-import ImagesGrid from "~/components/ImagesGrid";
+import FavoriteImagesGrid from "~/components/FavoriteImagesGrid";
 import Layout from "~/components/Layout";
 
-export default function UserGrid() {
+export default function FavoriteGrid() {
   return (
     <Box component="main">
       <Layout>
-        <ImagesGrid onlyUser={true} />
+        <FavoriteImagesGrid onlyUser={true} />
       </Layout>
     </Box>
   );

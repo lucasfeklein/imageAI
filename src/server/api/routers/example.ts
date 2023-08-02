@@ -116,4 +116,34 @@ export const imageRouter = createTRPCRouter({
         });
       }
     }),
+
+  getFavoriteImages: protectedProcedure
+    .input(z.object({ cursor: z.string().nullish() }))
+    .query(async ({ ctx, input }) => {
+      const { cursor } = input;
+      const items = await ctx.prisma.image.findMany({
+        where: {
+          favorites: {
+            some: {
+              userId: ctx.session.user.id,
+            },
+          },
+        },
+        include: {
+          favorites: true,
+        },
+        take: 20 + 1, // get an extra item at the end which we'll use as next cursor
+        cursor: cursor ? { id: cursor } : undefined,
+        orderBy: {
+          createdAt: "desc",
+        },
+      });
+
+      const nextCursor = items.length > 20 ? items.pop()?.id : undefined;
+
+      return {
+        items,
+        nextCursor,
+      };
+    }),
 });
