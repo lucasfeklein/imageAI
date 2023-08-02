@@ -65,8 +65,6 @@ const Generator = () => {
       )
       .join(", ");
 
-    console.log(prompt);
-
     postImage.mutate({
       prompt,
     });

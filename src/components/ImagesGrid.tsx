@@ -1,17 +1,14 @@
-import { Box, Loader, Overlay, Skeleton } from "@mantine/core";
-import Image from "next/image";
-import { useContext, useEffect } from "react";
+import { Box, Center, Loader, Skeleton } from "@mantine/core";
+import { useEffect } from "react";
 import Masonry, { ResponsiveMasonry } from "react-responsive-masonry";
 import { api } from "~/utils/api";
-import { BlurImagesContext } from "./BlurImagesProvider";
+import ImageWithHover from "./ImageWithHover";
 
 interface ImagesGridProps {
   onlyUser: boolean;
 }
 
 const ImagesGrid: React.FC<ImagesGridProps> = ({ onlyUser }) => {
-  const { isBlur } = useContext(BlurImagesContext);
-
   const { data, fetchNextPage, hasNextPage, isFetchingNextPage } =
     api.example.getImages.useInfiniteQuery(
       {
@@ -26,15 +23,13 @@ const ImagesGrid: React.FC<ImagesGridProps> = ({ onlyUser }) => {
 
   const dataFilter = itemsArray?.filter((image) =>
     onlyUser ? true : image.imageUrl !== null
-  ) as {
-    imageUrl: string;
-  }[];
+  );
 
   // Function to check if the user has reached the end of the page
   const handleScroll = () => {
     if (!isFetchingNextPage && hasNextPage) {
       const scrolledToBottom =
-        window.innerHeight + window.scrollY >= document.body.offsetHeight;
+        window.innerHeight + window.scrollY + 50 >= document.body.offsetHeight;
 
       if (scrolledToBottom) {
         fetchNextPage();
@@ -50,26 +45,23 @@ const ImagesGrid: React.FC<ImagesGridProps> = ({ onlyUser }) => {
 
   return (
     <>
-      <ResponsiveMasonry columnsCountBreakPoints={{ 350: 2, 750: 3, 900: 4 }}>
-        <Masonry gutter="0.5rem">
-          {dataFilter?.map((image, i) =>
-            image.imageUrl ? (
-              <Box key={i} sx={{ position: "relative" }}>
-                <Image
-                  src={image.imageUrl}
-                  alt={`Image ${i}`}
-                  width={120}
-                  height={120}
-                  layout="responsive"
-                />
-                {isBlur && <Overlay blur={40}></Overlay>}
-              </Box>
-            ) : (
-              <Skeleton height="100%" width="100%" />
-            )
-          )}
-        </Masonry>
-      </ResponsiveMasonry>
+      {dataFilter?.length ? (
+        <ResponsiveMasonry columnsCountBreakPoints={{ 350: 2, 750: 3, 900: 4 }}>
+          <Masonry gutter="0.5rem">
+            {dataFilter?.map((image, i) =>
+              image.imageUrl ? (
+                <ImageWithHover image={image} key={i} />
+              ) : (
+                <Skeleton height="100%" width="100%" key={i} />
+              )
+            )}
+          </Masonry>
+        </ResponsiveMasonry>
+      ) : (
+        <Center h="calc(100vh - 3.75rem)">
+          <Loader />
+        </Center>
+      )}
       {isFetchingNextPage && (
         <Box
           sx={{
