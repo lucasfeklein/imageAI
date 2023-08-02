@@ -17,7 +17,7 @@ export default function Home() {
       </Head>
       <Box component="main">
         <Layout>
-          <ImagesGrid onlyUser={false} />
+          <ImagesGrid onlyUser={false} onlyFavorite={false} />
         </Layout>
       </Box>
     </>

@@ -6,7 +6,7 @@ export default function UserGrid() {
   return (
     <Box component="main">
       <Layout>
-        <ImagesGrid onlyUser={true} />
+        <ImagesGrid onlyUser={true} onlyFavorite={false} />
       </Layout>
     </Box>
   );

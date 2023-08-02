@@ -10,11 +10,28 @@ import downloadAndUploadImage from "~/utils/uploadImage";
 
 export const imageRouter = createTRPCRouter({
   getImages: publicProcedure
-    .input(z.object({ onlyUser: z.boolean(), cursor: z.string().nullish() }))
+    .input(
+      z.object({
+        onlyUser: z.boolean(),
+        onlyFavorite: z.boolean(),
+        cursor: z.string().nullish(),
+      })
+    )
     .query(async ({ ctx, input }) => {
-      const { cursor, onlyUser } = input;
+      const { cursor, onlyUser, onlyFavorite } = input;
 
-      const where = onlyUser ? { userId: ctx.session?.user.id } : {};
+      const where =
+        onlyUser && !onlyFavorite
+          ? { userId: ctx.session?.user.id }
+          : onlyUser && onlyFavorite
+          ? {
+              favorites: {
+                some: {
+                  userId: ctx.session?.user.id,
+                },
+              },
+            }
+          : {};
 
       const items = await ctx.prisma.image.findMany({
         where,
@@ -115,35 +132,5 @@ export const imageRouter = createTRPCRouter({
           },
         });
       }
-    }),
-
-  getFavoriteImages: protectedProcedure
-    .input(z.object({ cursor: z.string().nullish() }))
-    .query(async ({ ctx, input }) => {
-      const { cursor } = input;
-      const items = await ctx.prisma.image.findMany({
-        where: {
-          favorites: {
-            some: {
-              userId: ctx.session.user.id,
-            },
-          },
-        },
-        include: {
-          favorites: true,
-        },
-        take: 20 + 1, // get an extra item at the end which we'll use as next cursor
-        cursor: cursor ? { id: cursor } : undefined,
-        orderBy: {
-          createdAt: "desc",
-        },
-      });
-
-      const nextCursor = items.length > 20 ? items.pop()?.id : undefined;
-
-      return {
-        items,
-        nextCursor,
-      };
     }),
 });

@@ -6,13 +6,15 @@ import ImageWithHover from "./ImageWithHover";
 
 interface ImagesGridProps {
   onlyUser: boolean;
+  onlyFavorite: boolean;
 }
 
-const ImagesGrid: React.FC<ImagesGridProps> = ({ onlyUser }) => {
+const ImagesGrid: React.FC<ImagesGridProps> = ({ onlyUser, onlyFavorite }) => {
   const { data, fetchNextPage, hasNextPage, isFetchingNextPage } =
     api.example.getImages.useInfiniteQuery(
       {
         onlyUser,
+        onlyFavorite,
       },
       {
         getNextPageParam: (lastPage) => lastPage.nextCursor,
