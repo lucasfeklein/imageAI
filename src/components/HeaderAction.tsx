@@ -122,7 +122,17 @@ export function HeaderAction({ links }: HeaderActionProps) {
   });
 
   return (
-    <Header height={HEADER_HEIGHT} sx={{ borderBottom: 0 }}>
+    <Header
+      height={HEADER_HEIGHT}
+      sx={{
+        borderBottom: 0,
+        position: "fixed",
+        borderRadius: "30px",
+        background: "#2A2B2E",
+        width: "70%",
+        margin: "20px auto",
+      }}
+    >
       <Container className={classes.inner} fluid>
         <Group>
           <Burger
@@ -151,12 +161,12 @@ export function HeaderAction({ links }: HeaderActionProps) {
               </Menu.Target>
 
               <Menu.Dropdown>
-                <Menu.Item icon={<IconPhoto />}>
-                  <Link href="/user">My photos</Link>
-                </Menu.Item>
-                <Menu.Item icon={<IconHeart />}>
-                  <Link href="/favorites">Favorite photos</Link>
-                </Menu.Item>
+                <Link href="/user">
+                  <Menu.Item icon={<IconPhoto />}>My photos</Menu.Item>
+                </Link>
+                <Link href="/favorites">
+                  <Menu.Item icon={<IconHeart />}>Favorite photos</Menu.Item>
+                </Link>
               </Menu.Dropdown>
             </Menu>
           )}
