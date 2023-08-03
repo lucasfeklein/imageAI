@@ -131,16 +131,26 @@ export function HeaderAction({ links }: HeaderActionProps) {
         background: "#2A2B2E",
         width: "70%",
         margin: "20px auto",
+        "@media (max-width: 767px)": {
+          width: "100%",
+          margin: 0,
+          borderRadius: "0",
+        },
       }}
     >
       <Container className={classes.inner} fluid>
         <Group>
-          <Burger
-            opened={opened}
-            onClick={toggle}
-            className={classes.burger}
-            size="sm"
-          />
+          <Menu opened={opened} onOpen={toggle} onClose={toggle}>
+            <Menu.Target>
+              <Burger
+                opened={opened}
+                onClick={toggle}
+                className={classes.burger}
+                size="sm"
+              />
+            </Menu.Target>
+            <Menu.Dropdown>{items}</Menu.Dropdown>
+          </Menu>
           <MantineLogo size={28} />
         </Group>
         <Group spacing={5} className={classes.links}>
