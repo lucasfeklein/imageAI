@@ -140,7 +140,7 @@ export function HeaderAction({ links }: HeaderActionProps) {
     >
       <Container className={classes.inner} fluid>
         <Group>
-          <Menu opened={opened} onOpen={toggle} onClose={toggle}>
+          <Menu opened={opened} onChange={toggle}>
             <Menu.Target>
               <Burger
                 opened={opened}
