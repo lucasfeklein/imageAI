@@ -54,7 +54,12 @@ const ImagesGrid: React.FC<ImagesGridProps> = ({ onlyUser, onlyFavorite }) => {
               image.imageUrl ? (
                 <ImageWithHover image={image} key={i} />
               ) : (
-                <Skeleton height="100%" width="100%" key={i} />
+                <Skeleton
+                  height="100%"
+                  width="100%"
+                  key={i}
+                  sx={{ minHeight: "100%" }}
+                />
               )
             )}
           </Masonry>
