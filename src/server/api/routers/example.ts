@@ -58,7 +58,7 @@ export const imageRouter = createTRPCRouter({
     }),
 
   postImage: protectedProcedure
-    .input(z.object({ prompt: z.string() }))
+    .input(z.object({ prompt: z.string(), negativePrompt: z.string() }))
     .mutation(async ({ ctx, input }) => {
       const replicate = new Replicate({
         auth: env.REPLICATE_API_TOKEN,
@@ -76,9 +76,8 @@ export const imageRouter = createTRPCRouter({
         "lucasfeklein/uber-klein:a961f299c0f8d6895f43a7756fee27c89ce5e6baa4d0c7cbb5c7d3efd241b289",
         {
           input: {
-            prompt: `detailed skin, realistic skin, highest quality, masterpiece, High detail, RAW color photo, ultra high resolution, highly detailed CG unified 8K wallpapers, physics-based rendering, cinematic lighting, ${input.prompt}`,
-            negative_prompt:
-              "((blurry)), duplicate, deformed, cartoon, animated, render, missing limbs, child, childish, deformed hands",
+            prompt: input.prompt,
+            negative_prompt: input.negativePrompt,
             width: 512,
             height: 512,
           },

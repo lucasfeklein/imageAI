@@ -1,4 +1,4 @@
-import { Box, Button, Chip, Overlay, Skeleton } from "@mantine/core";
+import { Box, Button, Overlay, Skeleton, Textarea } from "@mantine/core";
 import { notifications } from "@mantine/notifications";
 import { IconX } from "@tabler/icons-react";
 import { useSession } from "next-auth/react";
@@ -19,6 +19,8 @@ type PromptObject = {
 };
 
 const Generator = () => {
+  const [prompt, setPrompt] = useState("");
+  const [negativePrompt, setNegativePrompt] = useState("");
   const [promptArray, setPromptArray] = useState<PromptObject[]>([]);
 
   const { data: sessionData } = useSession();
@@ -46,27 +48,9 @@ const Generator = () => {
       });
     }
 
-    const promptObj: any = {};
-
-    for (const el of promptArray) {
-      if (promptObj[el.category]) {
-        promptObj[el.category].push(el.value);
-      } else {
-        promptObj[el.category] = [el.value];
-      }
-    }
-
-    const prompt = Object.entries(promptObj)
-      .map(
-        ([category, valuesArray]) =>
-          `${(categoryTitle as any)[category]}: ${(
-            valuesArray as string[]
-          ).join(", ")}`
-      )
-      .join(", ");
-
     postImage.mutate({
       prompt,
+      negativePrompt,
     });
   };
 
@@ -131,42 +115,26 @@ const Generator = () => {
               </Button>
             )}
           </Box>
-          {Object.entries(chipsObject).map(([category, arrayOfChips]) => {
-            return (
-              <Box sx={{ width: "100%" }} key={category}>
-                <Box
-                  sx={{
-                    fontSize: "24px",
-                    fontWeight: "bold",
-                    borderBottom: "2px solid #e8590c",
-                    paddingBottom: "8px",
-                    textTransform: "uppercase",
-                    fontFamily: "Arial, sans-serif",
-                    letterSpacing: "2px",
-                    marginBottom: "1rem",
-                  }}
-                >
-                  {categoryTitle[category as keyof typeof categoryTitle]}
-                </Box>
-                <Box sx={{ display: "flex", gap: "1rem", flexWrap: "wrap" }}>
-                  {arrayOfChips.map((value, i) => (
-                    <Chip
-                      key={i}
-                      checked={Boolean(
-                        promptArray.find((obj) => obj.value === value)
-                      )}
-                      onClick={() => handleChipClick(category, value)}
-                    >
-                      {value}
-                    </Chip>
-                  ))}
-                </Box>
-              </Box>
-            );
-          })}
+
+          <Textarea
+            sx={{ width: "100%" }}
+            placeholder="An illustration of a red owl with bright blue eyes"
+            minRows={5}
+            label="Prompt"
+            value={prompt}
+            onChange={(e) => setPrompt(e.target.value)}
+          />
+          <Textarea
+            sx={{ width: "100%" }}
+            placeholder="blurry, deformed, unnatural colors"
+            minRows={5}
+            label="Negative Prompt"
+            value={negativePrompt}
+            onChange={(e) => setNegativePrompt(e.target.value)}
+          />
 
           <Button
-            sx={{ position: "fixed", left: "50%", bottom: "5%" }}
+            sx={{ position: "fixed", left: "50%", bottom: "5%", zIndex: 99 }}
             type="submit"
             loading={postImage.isLoading}
           >
